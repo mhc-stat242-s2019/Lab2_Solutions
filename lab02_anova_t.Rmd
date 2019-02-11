@@ -1,0 +1,97 @@
+---
+title: "Lab02 - t tests and confidence intervals for ANOVA"
+author: "Your Name Here"
+output: pdf_document
+---
+
+## Goals
+
+The goal in this lab is to get some practice working with t-based inference for ANOVA models in R.
+
+## Loading packages
+
+Here are some packages with functionality you may need for this lab.  Run this code chunk now.
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(mosaic)
+library(gmodels)
+
+options("pillar.sigfig" = 10) # print 10 significant digits in summarize output
+```
+
+## Reading in the Spock data
+
+The following R code reads in the data set for the Spock Trial and takes a first look at the data.  Run this code now; no need to modify it.
+
+```{r}
+juries <- read_csv("http://www.evanlray.com/data/sleuth3/ex0502_women_jurors.csv")
+
+dim(juries)
+head(juries)
+
+juries %>% count(Judge)
+```
+
+## Make some plots
+
+Use this space to make some plots of the Spock trial data.
+
+```{r}
+ggplot(data = juries, mapping = aes(x = Judge, y = Percent)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(data = juries, mapping = aes(x = Percent)) +
+  geom_histogram() +
+  facet_wrap( ~ Judge)
+```
+
+## t tests and confidence intervals
+
+Use this space to conduct hypothesis tests and find confidence intervals.
+
+```{r}
+fit <- lm(Percent ~ Judge, data = juries)
+```
+
+#### Below is code relevant to part 2 (a) on the handout from 2019-02-04
+
+```{r}
+library(gmodels)
+fit.contrast(fit, "Judge", c(1, 0, 0, 0, 0, 0, -1), conf.int = 0.95)
+```
+
+
+```{r}
+juries %>%
+  group_by(Judge) %>%
+  summarize(
+    mean_pct_women = mean(Percent)
+  )
+```
+
+```{r}
+34.12 - 14.62
+```
+
+
+
+#### Below is code relevant to part 2 (b) on the handout from 2019-02-04
+
+```{r}
+library(gmodels)
+fit.contrast(fit, "Judge", c(1/6, 1/6, 1/6, 1/6, 1/6, 1/6, -1), conf.int = 0.95)
+```
+
+The formatting of the output above is not good.  Below I'm dropping that extra junk to make the results easier to read.
+
+```{r}
+temp <- fit.contrast(fit, "Judge", c(1/6, 1/6, 1/6, 1/6, 1/6, 1/6, -1), conf.int = 0.95)
+rownames(temp) <- NULL
+temp
+```
